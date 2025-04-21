@@ -97,4 +97,13 @@ register.post("/registration", multerupload.single('profile'), async (req, res) 
     }
 });
     
+register.get("/users", async (req, res) => {
+    try {
+        const users = await registerschema.find({}, { password: 0 }); // Exclude password from results
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("Fetching Users Error:", error);
+        res.status(500).json({ message: "Server error while fetching users" });
+    }
+});
 export default register
