@@ -19,7 +19,7 @@ const regSchema = new mongoose.Schema({
         required: true
     },
     phnumber: {
-        type: Number,
+        type: String,
         required: true
     },
     profile: {
