@@ -7,8 +7,8 @@ const EpisodeSchema = new mongoose.Schema({
     thumbnail: { type: String, required: true },
     video: { type: String, required: true },
     date: { type: Date, required: true },
-    series: { type: String },
-    season: { type: String },
+    series: { type: String, required: true },
+    season: { type: String, required: true },
     episodecount: { type: Number, required: true },
 
 }, { timestamps: true });
