@@ -17,8 +17,8 @@ AddEpisode.post(
                 description,
                 date,
                 episodecount,
-                series_id,
-                season_id,
+                series,
+                season,
             } = req.body;
 
             const thumbnail = req.files["thumbnail"]?.[0]?.path || "";
@@ -29,8 +29,8 @@ AddEpisode.post(
                 description,
                 date,
                 episodecount,
-                series_id,
-                season_id,
+                series,
+                season,
                 thumbnail,
                 video,
             });
