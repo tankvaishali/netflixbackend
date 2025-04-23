@@ -1,10 +1,13 @@
 import express from 'express';
 import multerupload from '../Middleware/multer.js';
 import Series from '../MongoDB/Schema/Series.js';
+import fs from 'fs';
+import Season from '../MongoDB/Schema/Season.js';
+import Episode from '../MongoDB/Schema/Episode.js';
 
 const AddSeries = express.Router();
 
-// Create Series
+// post
 AddSeries.post('/addseries', multerupload.fields([
     { name: 'thumbnail', maxCount: 1 },
     { name: 'video', maxCount: 1 }
@@ -41,7 +44,7 @@ AddSeries.post('/addseries', multerupload.fields([
     }
 });
 
-// Get All Series
+// Get
 AddSeries.get('/addseries', async (req, res) => {
     try {
         const data = await Series.find();
@@ -50,5 +53,78 @@ AddSeries.get('/addseries', async (req, res) => {
         res.status(500).json({ error: "Failed to fetch series" });
     }
 });
+
+// delete
+AddSeries.delete('/addseries/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const existing = await Series.findById(id);
+        if (!existing) return res.status(404).json({ error: "Series not found" });
+
+        // Remove files if they exist
+        if (existing.thumbnail) fs.unlink(existing.thumbnail, () => { });
+        if (existing.video) fs.unlink(existing.video, () => { });
+
+        // Delete related seasons and episodes
+        await Season.deleteMany({ series_id: id });
+        await Episode.deleteMany({ series_id: id });
+
+        // Now delete the series
+        await Series.findByIdAndDelete(id);
+
+        res.json({ message: "Series and related data deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to delete series and related data" });
+    }
+});
+
+
+AddSeries.patch('/addseries/:id', multerupload.fields([
+    { name: 'thumbnail', maxCount: 1 },
+    { name: 'video', maxCount: 1 }
+]), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {
+            title,
+            description,
+            genres,
+            releaseDate,
+            isFeatured,
+            status
+        } = req.body;
+
+        const existing = await Series.findById(id);
+        if (!existing) return res.status(404).json({ error: "Series not found" });
+
+        // Handle new file uploads and delete old files if replaced
+        if (req.files?.thumbnail?.[0]?.path) {
+            if (existing.thumbnail) fs.unlink(existing.thumbnail, () => { });
+            existing.thumbnail = req.files.thumbnail[0].path;
+        }
+
+        if (req.files?.video?.[0]?.path) {
+            if (existing.video) fs.unlink(existing.video, () => { });
+            existing.video = req.files.video[0].path;
+        }
+
+        // Update other fields
+        if (title) existing.title = title;
+        if (description) existing.description = description;
+        if (genres) existing.genres = genres.split(',').map(g => g.trim());
+        if (releaseDate) existing.releaseDate = releaseDate;
+        if (typeof isFeatured !== 'undefined') existing.isFeatured = isFeatured === 'true';
+        if (status) existing.status = status;
+
+        await existing.save();
+        res.json({ message: "Series updated successfully", series: existing });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to update series" });
+    }
+});
+
 
 export default AddSeries;

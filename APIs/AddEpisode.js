@@ -1,9 +1,12 @@
 import express from "express";
 import Episode from "../MongoDB/Schema/Episode.js";
 import multerupload from "../Middleware/multer.js";
+import fs from 'fs'
 
+// http://localhost:8000/addepisode
 const AddEpisode = express.Router();
 
+// post
 AddEpisode.post(
     "/addepisode",
     multerupload.fields([
@@ -43,10 +46,33 @@ AddEpisode.post(
     }
 );
 
-// http://localhost:8000/addepisode
+//get
 AddEpisode.get('/addepisode', async (req, res) => {
     const data = await Episode.find()
     res.send({ data })
 })
+
+
+// delete
+AddEpisode.delete('/addepisode/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const existing = await Episode.findById(id);
+        if (!existing) return res.status(404).json({ error: "Episode not found" });
+
+        // Remove files if they exist
+        if (existing.thumbnail) fs.unlink(existing.thumbnail, () => { });
+        if (existing.video) fs.unlink(existing.video, () => { });
+
+        await Episode.findByIdAndDelete(id);
+
+        res.json({ message: "Series and related data deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to delete episode and related data" });
+    }
+});
+
 
 export default AddEpisode;
