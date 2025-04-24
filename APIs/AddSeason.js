@@ -54,4 +54,26 @@ AddSeason.delete('/addseason/:id', async (req, res) => {
 });
 
 // update
+AddSeason.put('/addseason/:id', multerupload.none(), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, series_id } = req.body;
+
+        const season = await Season.findById(id);
+        if (!season) {
+            return res.status(404).json({ error: "Season not found" });
+        }
+
+        if (title) season.title = title;
+        if (series_id) season.series_id = series_id;
+
+        await season.save();
+
+        res.json({ message: "Season updated successfully", season });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to update Season" });
+    }
+});
+
 export default AddSeason;
