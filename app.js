@@ -10,6 +10,7 @@ import adminlogin from './APIs/AdminpanelLogin.js';
 import AddSeason from './APIs/AddSeason.js';
 import AddEpisode from './APIs/AddEpisode.js';
 import AddSeries from './APIs/AddSeries.js';
+import ChunkUpload from './Middleware/ChunkUpload.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,5 +29,9 @@ app.use("/", register)
 app.use("/", AddSeason)
 app.use("/", AddEpisode)
 app.use("/", AddSeries)
+
+//add this 
+app.use("/", ChunkUpload);
+//and install fs-extra
 
 app.listen(8000, () => console.log("Server running on port 8000"));
