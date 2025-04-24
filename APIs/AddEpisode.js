@@ -15,13 +15,13 @@ AddEpisode.post(
     ]),
     async (req, res) => {
         try {
-            const { title, description, date, episodecount, series, season } = req.body;
+            const { title, description, date, episodecount, season } = req.body;
 
             const thumbnail = req.files["thumbnail"]?.[0]?.path || "";
             const video = req.files["video"]?.[0]?.path || "";
 
             const episode = new Episode({
-                title, description, date, episodecount, series, season, thumbnail, video,
+                title, description, date, episodecount, season, thumbnail, video,
             });
 
             await episode.save();
@@ -67,7 +67,7 @@ AddEpisode.put('/addepisode/:id', multerupload.fields([
 ]), async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, date, episodecount, series, season } = req.body;
+        const { title, description, date, episodecount, season } = req.body;
 
         const episode = await Episode.findById(id);
         if (!episode) {
