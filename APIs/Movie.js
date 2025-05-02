@@ -96,4 +96,41 @@ addMovie.get('/addmovie', async (req, res) => {
     res.send({ data });
 });
 
+addMovie.delete('/movie/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const movie = await Movie.findById(id);
+        if (!movie) {
+            return res.status(404).json({ error: 'Movie not found' });
+        }
+
+        // Remove video file
+        if (movie.videoUrl) {
+            const videoPath = path.join(process.cwd(), movie.videoUrl);
+            if (fs.existsSync(videoPath)) {
+                fs.unlinkSync(videoPath);
+            }
+        }
+
+        // Remove thumbnail file
+        if (movie.thumbnailUrl) {
+            const thumbnailPath = path.join(process.cwd(), movie.thumbnailUrl);
+            if (fs.existsSync(thumbnailPath)) {
+                fs.unlinkSync(thumbnailPath);
+            }
+        }
+
+        // Delete from database
+        await Movie.findByIdAndDelete(id);
+
+        res.json({ message: 'Movie deleted successfully' });
+
+    } catch (err) {
+        console.error('Error deleting movie:', err);
+        res.status(500).json({ error: 'Failed to delete movie' });
+    }
+});
+
+
 export default addMovie;
