@@ -6,7 +6,7 @@ const pricingPlans = [
     {
         save: "Save 73%",
         name: 'Basic',
-        price_per_month: "$2.99 /mo",
+        price_per_month: "$2.99",
         extra: "+ 3 Extra months",
         total_price: "$304.83 ",
         new_prise: "$80.73",
@@ -20,7 +20,7 @@ const pricingPlans = [
     {
         save: "Save 73%",
         name: 'Plus',
-        price_per_month: "$3.89 /mo",
+        price_per_month: "$3.89",
         extra: "+ 3 Extra months",
         total_price: "$393.93",
         new_prise: "$105.03",
@@ -37,7 +37,7 @@ const pricingPlans = [
     {
         save: "Save 72%",
         name: 'Complete',
-        price_per_month: "$4.89 /mo",
+        price_per_month: "$4.89",
         extra: "+ 3 Extra months",
         total_price: "$480.33",
         new_prise: "$132.03",
