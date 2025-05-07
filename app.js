@@ -11,6 +11,7 @@ import AddSeason from './APIs/AddSeason.js';
 import AddEpisode from './APIs/AddEpisode.js';
 import AddSeries from './APIs/AddSeries.js';
 import addMovie from './APIs/Movie.js';
+import subscription from './APIs/Subscription.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,5 +31,6 @@ app.use("/", AddSeason)
 app.use("/", AddEpisode)
 app.use("/", AddSeries)
 app.use('/', addMovie);
+app.use('/', subscription);
 
 app.listen(8000, () => console.log("Server running on port 8000"));
