@@ -4,22 +4,28 @@ const subscription = express();
 
 const pricingPlans = [
     {
+        save: "Save 73%",
         name: 'Basic',
-        price_per_month: 2.99,
-        total_price: 80.73,
-        original_price: 300.63,
-        duration_months: 27,
+        price_per_month: "$2.99 /mo",
+        extra: "+ 3 Extra months",
+        total_price: "$304.83 ",
+        new_prise: "$80.73",
+        button: "Get Basic",
+        time_duration: "27 months",
         features: [
             'Secure, high-speed VPN',
             '30-day money-back guarantee'
         ]
     },
     {
+        save: "Save 73%",
         name: 'Plus',
-        price_per_month: 3.89,
-        total_price: 105.03,
-        original_price: 393.93,
-        duration_months: 27,
+        price_per_month: "$3.89 /mo",
+        extra: "+ 3 Extra months",
+        total_price: "$393.93",
+        new_prise: "$105.03",
+        button: "Get Plus",
+        time_duration: "27 months",
         features: [
             'Secure, high-speed VPN',
             'Threat Protection Pro™: Anti-malware and advanced browsing protection',
@@ -29,11 +35,14 @@ const pricingPlans = [
         ]
     },
     {
+        save: "Save 72%",
         name: 'Complete',
-        price_per_month: 4.89,
-        total_price: 132.03,
-        original_price: 480.33,
-        duration_months: 27,
+        price_per_month: "$4.89 /mo",
+        extra: "+ 3 Extra months",
+        total_price: "$480.33",
+        new_prise: "$132.03",
+        button: "Get Complete",
+        time_duration: "27 months",
         features: [
             'Secure, high-speed VPN',
             'Threat Protection Pro™: Anti-malware and advanced browsing protection',
