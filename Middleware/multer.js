@@ -19,20 +19,3 @@ const storage = multer.diskStorage({
 const multerupload = multer({ storage });
 
 export default multerupload;
-
-// import multer from 'multer';
-// import { CloudinaryStorage } from 'multer-storage-cloudinary';
-// import cloudinary from './cloudinaryConfig.js';
-
-// const storage = new CloudinaryStorage({
-//     cloudinary: cloudinary,
-//     params: {
-//         folder: 'uploads',
-//         allowed_formats: ['jpg', 'png', 'jpeg', 'mp4', 'mov'],
-//         transformation: [{ quality: 'auto' }, { fetch_format: 'auto' }]
-//     }
-// });
-
-// const multerupload = multer({ storage });
-
-// export default multerupload;
