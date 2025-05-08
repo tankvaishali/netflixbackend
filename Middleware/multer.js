@@ -22,5 +22,29 @@
 import multer from 'multer';
 import { storage } from './Cloudinary.js';
 
-const multerupload = multer({ storage });
+const multerupload = multer({
+  storage,
+  limits: {
+    fileSize: 1024 * 1024 * 1024, // 1GB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === 'video') {
+      if (file.mimetype.startsWith('video/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only video files are allowed for the "video" field.'));
+      }
+    } else if (file.fieldname === 'thumbnail') {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed for the "thumbnail" field.'));
+      }
+    } else {
+      cb(null, true);
+    }
+  }
+});
+
 export default multerupload;
+
