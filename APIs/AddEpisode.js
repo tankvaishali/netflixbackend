@@ -47,6 +47,18 @@ AddEpisode.delete('/addepisode/:id', async (req, res) => {
         const existing = await Episode.findById(id);
         if (!existing) return res.status(404).json({ error: "Episode not found" });
 
+         const extractPublicId = (filePath, folder) => {
+              const filename = path.basename(filePath, path.extname(filePath));
+              return `${folder}/${filename}`;
+            };
+        
+            const thumbnailPublicId = extractPublicId(existing.thumbnail, 'series_thumbnails');
+            const videoPublicId = extractPublicId(existing.video, 'series_videos');
+        
+            // Delete from Cloudinary
+            await cloudinary.uploader.destroy(thumbnailPublicId, { resource_type: 'image' });
+            await cloudinary.uploader.destroy(videoPublicId, { resource_type: 'video' });
+        
         // Remove files if they exist
         if (existing.thumbnail) fs.unlink(existing.thumbnail, () => { });
         if (existing.video) fs.unlink(existing.video, () => { });

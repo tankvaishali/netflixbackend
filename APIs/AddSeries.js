@@ -125,6 +125,8 @@ import multerupload from '../Middleware/multer.js';
 import Series from '../MongoDB/Schema/Series.js';
 import Season from '../MongoDB/Schema/Season.js';
 import Episode from '../MongoDB/Schema/Episode.js';
+import { cloudinary } from '../Middleware/Cloudinary.js';
+import path from 'path';
 
 const AddSeries = express.Router();
 
@@ -201,8 +203,7 @@ AddSeries.put('/addseries/:id', multerupload.fields([
     res.status(500).json({ error: "Failed to update series" });
   }
 });
-import { cloudinary } from '../Middleware/Cloudinary.js';
-import path from 'path';
+
 
 AddSeries.delete('/addseries/:id', async (req, res) => {
   try {
