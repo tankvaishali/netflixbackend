@@ -9,12 +9,15 @@ cloudinary.config({
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: (req, file) => {
+  params: async (req, file) => {
     const folder = file.fieldname === 'video' ? 'series_videos' : 'series_thumbnails';
     return {
       folder,
       resource_type: file.fieldname === 'video' ? 'video' : 'image',
       public_id: `${Date.now()}-${file.originalname}`,
+      use_filename: true,
+      unique_filename: false,
+      chunk_size: 6000000, // 6MB chunking for large video uploads
     };
   },
 });
