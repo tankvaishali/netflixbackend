@@ -14,10 +14,7 @@ const storage = new CloudinaryStorage({
     return {
       folder,
       resource_type: file.fieldname === 'video' ? 'video' : 'image',
-      public_id: `${Date.now()}-${file.originalname}`,
-      use_filename: true,
-      unique_filename: false,
-      chunk_size: 6000000, // 6MB chunking for large video uploads
+      public_id: `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`,
     };
   },
 });
