@@ -25,7 +25,8 @@ import { storage } from './Cloudinary.js';
 const multerupload = multer({
   storage,
   limits: {
-    fileSize: 1024 * 1024 * 1024, // 1GB limit
+    fieldSize: 1024 * 1024 * 1024 * 5, // Allow up to 5GB (adjust if needed)
+    fileSize: 1024 * 1024 * 1024 * 5,
   },
   fileFilter: (req, file, cb) => {
     if (file.fieldname === 'video') {
