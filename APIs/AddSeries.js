@@ -166,23 +166,6 @@ AddSeries.get('/addseries', async (req, res) => {
   }
 });
 
-AddSeries.delete('/addseries/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const existing = await Series.findById(id);
-    if (!existing) return res.status(404).json({ error: "Series not found" });
-
-    await Season.deleteMany({ series_id: id });
-    await Episode.deleteMany({ series_id: id });
-    await Series.findByIdAndDelete(id);
-
-    res.json({ message: "Series and related data deleted successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to delete series" });
-  }
-});
 
 AddSeries.put('/addseries/:id', multerupload.fields([
   { name: 'thumbnail', maxCount: 1 },
@@ -218,5 +201,42 @@ AddSeries.put('/addseries/:id', multerupload.fields([
     res.status(500).json({ error: "Failed to update series" });
   }
 });
+import { cloudinary } from '../Middleware/Cloudinary.js';
+import path from 'path';
+
+AddSeries.delete('/addseries/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const existing = await Series.findById(id);
+    if (!existing) return res.status(404).json({ error: "Series not found" });
+
+    // Extract public IDs from Cloudinary URLs
+    const extractPublicId = (filePath, folder) => {
+      const filename = path.basename(filePath, path.extname(filePath));
+      return `${folder}/${filename}`;
+    };
+
+    const thumbnailPublicId = extractPublicId(existing.thumbnail, 'series_thumbnails');
+    const videoPublicId = extractPublicId(existing.video, 'series_videos');
+
+    // Delete from Cloudinary
+    await cloudinary.uploader.destroy(thumbnailPublicId, { resource_type: 'image' });
+    await cloudinary.uploader.destroy(videoPublicId, { resource_type: 'video' });
+
+    // Delete associated seasons and episodes
+    await Season.deleteMany({ series_id: id });
+    await Episode.deleteMany({ series_id: id });
+
+    // Delete series
+    await Series.findByIdAndDelete(id);
+
+    res.json({ message: "Series and related data deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to delete series" });
+  }
+});
+
 
 export default AddSeries;
