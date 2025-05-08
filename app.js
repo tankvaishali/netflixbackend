@@ -34,3 +34,4 @@ app.use('/', addMovie);
 app.use('/', subscription);
 
 app.listen(8000, () => console.log("Server running on port 8000"));
+

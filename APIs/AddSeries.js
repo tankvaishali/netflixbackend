@@ -1,5 +1,126 @@
+// import express from 'express';
+// import fs from 'fs';
+// import multerupload from '../Middleware/multer.js';
+// import Series from '../MongoDB/Schema/Series.js';
+// import Season from '../MongoDB/Schema/Season.js';
+// import Episode from '../MongoDB/Schema/Episode.js';
+
+// const AddSeries = express.Router();
+
+// // post
+// AddSeries.post('/addseries', multerupload.fields([
+//     { name: 'thumbnail', maxCount: 1 },
+//     { name: 'video', maxCount: 1 }
+// ]), async (req, res) => {
+//     try {
+//         const { title, description, genres, releaseDate, isFeatured, status } = req.body;
+
+//         const thumbnail = req.files?.thumbnail?.[0]?.path;
+//         const video = req.files?.video?.[0]?.path;
+
+//         const series = new Series({
+//             title, description, thumbnail, video, genres: genres?.split(',').map(g => g.trim()), releaseDate, isFeatured: isFeatured === 'true', status
+//         });
+
+//         await series.save();
+//         res.status(201).json({ message: "Series created successfully", series });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: "Failed to create series" });
+//     }
+// });
+
+// // Get
+// AddSeries.get('/addseries', async (req, res) => {
+//     try {
+//         const data = await Series.find();
+//         res.json({ data });
+//     } catch (error) {
+//         res.status(500).json({ error: "Failed to fetch series" });
+//     }
+// });
+
+// // delete
+// AddSeries.delete('/addseries/:id', async (req, res) => {
+//     try {
+//         const { id } = req.params;
+
+//         const existing = await Series.findById(id);
+//         if (!existing) return res.status(404).json({ error: "Series not found" });
+
+//         // Remove files if they exist
+//         if (existing.thumbnail) fs.unlink(existing.thumbnail, () => { });
+//         if (existing.video) fs.unlink(existing.video, () => { });
+
+//         // Delete related seasons and episodes
+//         await Season.deleteMany({ series_id: id });
+//         await Episode.deleteMany({ series_id: id });
+
+//         // Now delete the series
+//         await Series.findByIdAndDelete(id);
+
+//         res.json({ message: "Series and related data deleted successfully" });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: "Failed to delete series and related data" });
+//     }
+// });
+
+// // update
+// AddSeries.put('/addseries/:id', multerupload.fields([
+//     { name: 'thumbnail', maxCount: 1 },
+//     { name: 'video', maxCount: 1 }
+// ]), async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const { title, description, genres, releaseDate, isFeatured, status } = req.body;
+
+//         const series = await Series.findById(id);
+//         if (!series) {
+//             return res.status(404).json({ error: "Series not found" });
+//         }
+
+//         // Handle new file uploads
+//         if (req.files?.thumbnail?.[0]?.path) {
+//             if (series.thumbnail) fs.unlink(series.thumbnail, () => { });
+//             series.thumbnail = req.files.thumbnail[0].path;
+//         }
+
+//         if (req.files?.video?.[0]?.path) {
+//             if (series.video) fs.unlink(series.video, () => { });
+//             series.video = req.files.video[0].path;
+//         }
+
+//         // Update fields if provided
+//         if (title) series.title = title;
+//         if (description) series.description = description;
+//         if (genres) series.genres = genres.split(',').map(g => g.trim());
+//         if (releaseDate) series.releaseDate = releaseDate;
+//         if (typeof isFeatured !== 'undefined') series.isFeatured = isFeatured === 'true';
+//         if (status) series.status = status;
+
+//         await series.save();
+
+//         res.json({ message: "Series updated successfully", series });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: "Failed to update series" });
+//     }
+// });
+
+// export default AddSeries;
+
+
+
+
+
+
+
+
+
+
+
 import express from 'express';
-import fs from 'fs';
 import multerupload from '../Middleware/multer.js';
 import Series from '../MongoDB/Schema/Series.js';
 import Season from '../MongoDB/Schema/Season.js';
@@ -7,105 +128,95 @@ import Episode from '../MongoDB/Schema/Episode.js';
 
 const AddSeries = express.Router();
 
-// post
 AddSeries.post('/addseries', multerupload.fields([
-    { name: 'thumbnail', maxCount: 1 },
-    { name: 'video', maxCount: 1 }
+  { name: 'thumbnail', maxCount: 1 },
+  { name: 'video', maxCount: 1 }
 ]), async (req, res) => {
-    try {
-        const { title, description, genres, releaseDate, isFeatured, status } = req.body;
+  try {
+    const { title, description, genres, releaseDate, isFeatured, status } = req.body;
 
-        const thumbnail = req.files?.thumbnail?.[0]?.path;
-        const video = req.files?.video?.[0]?.path;
+    const thumbnail = req.files?.thumbnail?.[0]?.path;
+    const video = req.files?.video?.[0]?.path;
 
-        const series = new Series({
-            title, description, thumbnail, video, genres: genres?.split(',').map(g => g.trim()), releaseDate, isFeatured: isFeatured === 'true', status
-        });
+    const series = new Series({
+      title,
+      description,
+      thumbnail,
+      video,
+      genres: genres?.split(',').map(g => g.trim()),
+      releaseDate,
+      isFeatured: isFeatured === 'true',
+      status
+    });
 
-        await series.save();
-        res.status(201).json({ message: "Series created successfully", series });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to create series" });
-    }
+    await series.save();
+    res.status(201).json({ message: "Series created successfully", series });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create series" });
+  }
 });
 
-// Get
 AddSeries.get('/addseries', async (req, res) => {
-    try {
-        const data = await Series.find();
-        res.json({ data });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to fetch series" });
-    }
+  try {
+    const data = await Series.find();
+    res.json({ data });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch series" });
+  }
 });
 
-// delete
 AddSeries.delete('/addseries/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-        const existing = await Series.findById(id);
-        if (!existing) return res.status(404).json({ error: "Series not found" });
+    const existing = await Series.findById(id);
+    if (!existing) return res.status(404).json({ error: "Series not found" });
 
-        // Remove files if they exist
-        if (existing.thumbnail) fs.unlink(existing.thumbnail, () => { });
-        if (existing.video) fs.unlink(existing.video, () => { });
+    await Season.deleteMany({ series_id: id });
+    await Episode.deleteMany({ series_id: id });
+    await Series.findByIdAndDelete(id);
 
-        // Delete related seasons and episodes
-        await Season.deleteMany({ series_id: id });
-        await Episode.deleteMany({ series_id: id });
-
-        // Now delete the series
-        await Series.findByIdAndDelete(id);
-
-        res.json({ message: "Series and related data deleted successfully" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to delete series and related data" });
-    }
+    res.json({ message: "Series and related data deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to delete series" });
+  }
 });
 
-// update
 AddSeries.put('/addseries/:id', multerupload.fields([
-    { name: 'thumbnail', maxCount: 1 },
-    { name: 'video', maxCount: 1 }
+  { name: 'thumbnail', maxCount: 1 },
+  { name: 'video', maxCount: 1 }
 ]), async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { title, description, genres, releaseDate, isFeatured, status } = req.body;
+  try {
+    const { id } = req.params;
+    const { title, description, genres, releaseDate, isFeatured, status } = req.body;
 
-        const series = await Series.findById(id);
-        if (!series) {
-            return res.status(404).json({ error: "Series not found" });
-        }
+    const series = await Series.findById(id);
+    if (!series) return res.status(404).json({ error: "Series not found" });
 
-        // Handle new file uploads
-        if (req.files?.thumbnail?.[0]?.path) {
-            if (series.thumbnail) fs.unlink(series.thumbnail, () => { });
-            series.thumbnail = req.files.thumbnail[0].path;
-        }
-
-        if (req.files?.video?.[0]?.path) {
-            if (series.video) fs.unlink(series.video, () => { });
-            series.video = req.files.video[0].path;
-        }
-
-        // Update fields if provided
-        if (title) series.title = title;
-        if (description) series.description = description;
-        if (genres) series.genres = genres.split(',').map(g => g.trim());
-        if (releaseDate) series.releaseDate = releaseDate;
-        if (typeof isFeatured !== 'undefined') series.isFeatured = isFeatured === 'true';
-        if (status) series.status = status;
-
-        await series.save();
-
-        res.json({ message: "Series updated successfully", series });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to update series" });
+    if (req.files?.thumbnail?.[0]?.path) {
+      series.thumbnail = req.files.thumbnail[0].path;
     }
+
+    if (req.files?.video?.[0]?.path) {
+      series.video = req.files.video[0].path;
+    }
+
+    if (title) series.title = title;
+    if (description) series.description = description;
+    if (genres) series.genres = genres.split(',').map(g => g.trim());
+    if (releaseDate) series.releaseDate = releaseDate;
+    if (typeof isFeatured !== 'undefined') series.isFeatured = isFeatured === 'true';
+    if (status) series.status = status;
+
+    await series.save();
+
+    res.json({ message: "Series updated successfully", series });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update series" });
+  }
 });
 
 export default AddSeries;
