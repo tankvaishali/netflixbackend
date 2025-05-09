@@ -81,41 +81,41 @@ AddEpisode.put('/addepisode/:id', multerupload.fields([
     }
 });
 
-import { cloudinary } from '../Middleware/Cloudinary.js';
+// import { cloudinary } from '../Middleware/Cloudinary.js';
 
 const extractPublicIdFromUrl = (url, folder) => {
-  // Example: https://res.cloudinary.com/yourname/video/upload/v1715168445715/episode_videos/1715168445715-ep1.mp4
-  const parts = url.split('/');
-  const filenameWithExt = parts[parts.length - 1]; // e.g., 1715168445715-ep1.mp4
-  const filename = filenameWithExt.split('.')[0]; // e.g., 1715168445715-ep1
-  return `${folder}/${filename}`; // e.g., episode_videos/1715168445715-ep1
+    // Example: https://res.cloudinary.com/yourname/video/upload/v1715168445715/episode_videos/1715168445715-ep1.mp4
+    const parts = url.split('/');
+    const filenameWithExt = parts[parts.length - 1]; // e.g., 1715168445715-ep1.mp4
+    const filename = filenameWithExt.split('.')[0]; // e.g., 1715168445715-ep1
+    return `${folder}/${filename}`; // e.g., episode_videos/1715168445715-ep1
 };
 
 AddEpisode.delete('/addepisode/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-    const existing = await Episode.findById(id);
-    if (!existing) return res.status(404).json({ error: "Episode not found" });
+        const existing = await Episode.findById(id);
+        if (!existing) return res.status(404).json({ error: "Episode not found" });
 
-    // Delete from Cloudinary
-    if (existing.thumbnail) {
-      const publicId = extractPublicIdFromUrl(existing.thumbnail, 'episode_thumbnails');
-      await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+        // // Delete from Cloudinary
+        // if (existing.thumbnail) {
+        //   const publicId = extractPublicIdFromUrl(existing.thumbnail, 'episode_thumbnails');
+        //   await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+        // }
+
+        // if (existing.video) {
+        //   const publicId = extractPublicIdFromUrl(existing.video, 'episode_videos');
+        //   await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+        // }
+
+        await Episode.findByIdAndDelete(id);
+
+        res.json({ message: "Episode and Cloudinary media deleted successfully" });
+    } catch (error) {
+        console.error("Cloudinary delete error:", error);
+        res.status(500).json({ error: "Failed to delete episode and media from Cloudinary" });
     }
-
-    if (existing.video) {
-      const publicId = extractPublicIdFromUrl(existing.video, 'episode_videos');
-      await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
-    }
-
-    await Episode.findByIdAndDelete(id);
-
-    res.json({ message: "Episode and Cloudinary media deleted successfully" });
-  } catch (error) {
-    console.error("Cloudinary delete error:", error);
-    res.status(500).json({ error: "Failed to delete episode and media from Cloudinary" });
-  }
 });
 
 export default AddEpisode;
