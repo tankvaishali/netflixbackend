@@ -282,14 +282,7 @@
 
 
 
-
-
-
-
-
-
 import express from 'express';
-import multerupload from '../Middleware/multer.js';
 import Series from '../MongoDB/Schema/Series.js';
 import Season from '../MongoDB/Schema/Season.js';
 import Episode from '../MongoDB/Schema/Episode.js';
@@ -298,21 +291,16 @@ import path from 'path';
 
 const AddSeries = express.Router();
 
-// Create Series
-AddSeries.post('/addseries', multerupload.fields([
-  { name: 'thumbnail', maxCount: 1 },
-  { name: 'video', maxCount: 1 }
-]), async (req, res) => {
+// Create Series (metadata only — video is already uploaded to Cloudinary from client)
+AddSeries.post('/addseries', async (req, res) => {
   try {
-    const { title, description, genres, releaseDate, isFeatured, status } = req.body;
-    const thumbnail = req.files?.thumbnail?.[0]?.path;
-    const video = req.files?.video?.[0]?.path;
+    const { title, description, genres, releaseDate, isFeatured, status, thumbnailUrl, videoUrl } = req.body;
 
     const series = new Series({
       title,
       description,
-      thumbnail,
-      video,
+      thumbnail: thumbnailUrl,
+      video: videoUrl,
       genres: genres?.split(',').map(g => g.trim()),
       releaseDate,
       isFeatured: isFeatured === 'true',
@@ -338,24 +326,22 @@ AddSeries.get('/addseries', async (req, res) => {
 });
 
 // Update Series
-AddSeries.put('/addseries/:id', multerupload.fields([
-  { name: 'thumbnail', maxCount: 1 },
-  { name: 'video', maxCount: 1 }
-]), async (req, res) => {
+AddSeries.put('/addseries/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, genres, releaseDate, isFeatured, status } = req.body;
+    const { title, description, genres, releaseDate, isFeatured, status, thumbnailUrl, videoUrl } = req.body;
+
     const series = await Series.findById(id);
     if (!series) return res.status(404).json({ error: "Series not found" });
 
-    if (req.files?.thumbnail?.[0]?.path) series.thumbnail = req.files.thumbnail[0].path;
-    if (req.files?.video?.[0]?.path) series.video = req.files.video[0].path;
     if (title) series.title = title;
     if (description) series.description = description;
     if (genres) series.genres = genres.split(',').map(g => g.trim());
     if (releaseDate) series.releaseDate = releaseDate;
     if (typeof isFeatured !== 'undefined') series.isFeatured = isFeatured === 'true';
     if (status) series.status = status;
+    if (thumbnailUrl) series.thumbnail = thumbnailUrl;
+    if (videoUrl) series.video = videoUrl;
 
     await series.save();
     res.json({ message: "Series updated successfully", series });
@@ -365,16 +351,16 @@ AddSeries.put('/addseries/:id', multerupload.fields([
   }
 });
 
-// Delete Series
+// Delete Series (delete from Cloudinary + DB)
 AddSeries.delete('/addseries/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const existing = await Series.findById(id);
     if (!existing) return res.status(404).json({ error: "Series not found" });
 
-    const extractPublicId = (filePath, folder) => {
-      const filename = path.basename(filePath, path.extname(filePath));
-      return `${folder}/${filename}`;
+    const extractPublicId = (url, folder) => {
+      const publicId = url?.split('/').pop()?.split('.')[0];
+      return `${folder}/${publicId}`;
     };
 
     const thumbnailPublicId = extractPublicId(existing.thumbnail, 'series_thumbnails');
