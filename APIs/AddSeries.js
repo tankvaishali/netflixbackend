@@ -15,17 +15,10 @@ AddSeries.post('/addseries', multerupload.fields([
   { name: 'video', maxCount: 1 }
 ]), async (req, res) => {
   try {
-    console.log("Incoming request body:", req.body);
-    console.log("Files received:", req.files);
-
     const { title, description, genres, releaseDate, isFeatured, status } = req.body;
 
     const thumbnail = req.files?.thumbnail?.[0]?.path;
     const video = req.files?.video?.[0]?.path;
-
-    if (!title || !description || !thumbnail || !video) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
 
     const series = new Series({
       title,
@@ -41,11 +34,10 @@ AddSeries.post('/addseries', multerupload.fields([
     await series.save();
     res.status(201).json({ message: "Series created successfully", series });
   } catch (error) {
-    console.error("Error while creating series:", error);
-    res.status(500).json({ error: "Failed to create series", details: error.message });
+    console.error(error);
+    res.status(500).json({ error: "Failed to create series" });
   }
 });
-
 
 AddSeries.get('/addseries', async (req, res) => {
   try {
