@@ -22,7 +22,7 @@ app.use(cors());
 
 MongoDb();
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // http://localhost:8000/uploads
 app.use("/", adminlogin)
 app.use("/", EpisodeUpload);

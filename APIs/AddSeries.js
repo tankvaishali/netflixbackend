@@ -17,8 +17,9 @@ AddSeries.post('/addseries', multerupload.fields([
   try {
     const { title, description, genres, releaseDate, isFeatured, status } = req.body;
 
-    const thumbnail = req.files?.thumbnail?.[0]?.path;
-    const video = req.files?.video?.[0]?.path;
+   
+const thumbnail = req.files?.thumbnail?.[0]?.path; // Already Cloudinary URL
+const video = req.files?.video?.[0]?.path;
 
     const series = new Series({
       title,
