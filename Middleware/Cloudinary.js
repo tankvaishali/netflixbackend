@@ -13,7 +13,7 @@ const storage = new CloudinaryStorage({
     return {
       folder: 'netflix_series',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'mov', 'avi', 'mkv', 'wmv', 'flv', 'm4v'],
-      public_id: Date.now().toString(),
+   public_id: (req, file) => `${Date.now()}-${file.originalname}`,
     };
   },
 });
