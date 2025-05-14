@@ -10,6 +10,34 @@ import path from 'path';
 
 const AddSeries = express.Router();
 
+// AddSeries.post('/addseries', multerupload.fields([
+//   { name: 'thumbnail', maxCount: 1 },
+//   { name: 'video', maxCount: 1 }
+// ]), async (req, res) => {
+//   try {
+//     const { title, description, genres, releaseDate, isFeatured, status } = req.body;
+
+//     const thumbnail = req.files?.thumbnail?.[0]?.path;
+//     const video = req.files?.video?.[0]?.path;
+
+//     const series = new Series({
+//       title,
+//       description,
+//       thumbnail,
+//       video,
+//       genres: genres?.split(',').map(g => g.trim()),
+//       releaseDate,
+//       isFeatured: isFeatured === 'true',
+//       status
+//     });
+
+//     await series.save();
+//     res.status(201).json({ message: "Series created successfully", series });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Failed to create series" });
+//   }
+// });
 AddSeries.post('/addseries', multerupload.fields([
   { name: 'thumbnail', maxCount: 1 },
   { name: 'video', maxCount: 1 }
@@ -17,8 +45,13 @@ AddSeries.post('/addseries', multerupload.fields([
   try {
     const { title, description, genres, releaseDate, isFeatured, status } = req.body;
 
-    const thumbnail = req.files?.thumbnail?.[0]?.path;
-    const video = req.files?.video?.[0]?.path;
+    const thumbnail = req.files?.thumbnail?.[0]?.filename
+      ? `/uploads/${req.files.thumbnail[0].filename}`
+      : null;
+
+    const video = req.files?.video?.[0]?.filename
+      ? `/uploads/${req.files.video[0].filename}`
+      : null;
 
     const series = new Series({
       title,
