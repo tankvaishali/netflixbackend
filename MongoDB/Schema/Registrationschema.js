@@ -33,5 +33,5 @@ const regSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-const registerschema = mongoose.model('regiter', regSchema);
+const registerschema = mongoose.model('register', regSchema);
 export default registerschema;
