@@ -54,14 +54,15 @@ import registerschema from "../MongoDB/Schema/Registrationschema.js";
 import multerupload from "../Middleware/multer.js";
 import fs from 'fs';
 import path from 'path';
+import { log } from "console";
 
 const register = express.Router();
-register.post("/registration", multerupload.single('profile'), async (req, res) => {
-    const { name, email, password, phnumber, subscription } = req.body;
 
-    console.log("Request body:", req.body);
+register.post("/registration", multerupload.single('profile'), async (req, res) => {
+    const { name, email, password, phnumber,subscription } = req.body;
 
     if (!name || !email || !password || !phnumber || !req.file || !subscription) {
+        // Clean up file if it exists
         if (req.file?.path) fs.unlinkSync(req.file.path);
         return res.status(400).json({ message: "All fields are required" });
     }
@@ -69,10 +70,12 @@ register.post("/registration", multerupload.single('profile'), async (req, res) 
     try {
         const existingUser = await registerschema.findOne({ email });
         if (existingUser) {
+            // Clean up uploaded file
             fs.unlinkSync(req.file.path);
             return res.status(409).json({ message: "Email already registered" });
         }
 
+        // Move file to real uploads folder
         const newPath = path.join('uploads', req.file.filename);
         fs.renameSync(req.file.path, newPath);
 
@@ -84,61 +87,17 @@ register.post("/registration", multerupload.single('profile'), async (req, res) 
             subscription,
             profile: req.file.filename
         });
-
-        await newUser.save();
-
-        res.status(201).json({
-            message: "User registered successfully",
-            newUser: newUser.toObject()
-        });
+        
+        
+        res.status(201).json({ message: "User registered successfully", newUser });
+        console.log(newUser);
 
     } catch (error) {
         console.error("Registration Error:", error);
-        if (req.file?.path) fs.unlinkSync(req.file.path);
+        if (req.file?.path) fs.unlinkSync(req.file.path); // Clean up
         res.status(500).json({ message: "Server error during registration" });
     }
 });
-
-// register.post("/registration", multerupload.single('profile'), async (req, res) => {
-//     const { name, email, password, phnumber,subscription } = req.body;
-
-//     if (!name || !email || !password || !phnumber || !req.file || !subscription) {
-//         // Clean up file if it exists
-//         if (req.file?.path) fs.unlinkSync(req.file.path);
-//         return res.status(400).json({ message: "All fields are required" });
-//     }
-
-//     try {
-//         const existingUser = await registerschema.findOne({ email });
-//         if (existingUser) {
-//             // Clean up uploaded file
-//             fs.unlinkSync(req.file.path);
-//             return res.status(409).json({ message: "Email already registered" });
-//         }
-
-//         // Move file to real uploads folder
-//         const newPath = path.join('uploads', req.file.filename);
-//         fs.renameSync(req.file.path, newPath);
-
-//         const newUser = new registerschema({
-//             name,
-//             email,
-//             password,
-//             phnumber,
-//             subscription,
-//             profile: req.file.filename
-//         });
-
-//         await newUser.save();
-
-//         res.status(201).json({ message: "User registered successfully", newUser });
-
-//     } catch (error) {
-//         console.error("Registration Error:", error);
-//         if (req.file?.path) fs.unlinkSync(req.file.path); // Clean up
-//         res.status(500).json({ message: "Server error during registration" });
-//     }
-// });
     
 register.get("/users", async (req, res) => {
     try {
