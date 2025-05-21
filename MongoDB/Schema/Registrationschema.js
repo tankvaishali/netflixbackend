@@ -25,7 +25,6 @@ const regSchema = new mongoose.Schema({
     profile: {
         type: String,
         required: true
-
     },
     subscription:{
         type:String,
