@@ -106,4 +106,26 @@ register.get("/users", async (req, res) => {
         res.status(500).json({ message: "Server error while fetching users" });
     }
 });
+
+register.delete("/users/:id", async (req, res) => {
+    try {
+        const user = await registerschema.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // Delete the profile image from 'uploads' folder
+        const filePath = path.join('uploads', user.profile);
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+
+        // Delete the user from the database
+        await registerschema.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+        console.error("Delete User Error:", error);
+        res.status(500).json({ message: "Server error while deleting user" });
+    }
+});
+
 export default register

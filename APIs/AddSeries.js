@@ -1,5 +1,4 @@
 
-
 import express from 'express';
 import multerupload from '../Middleware/multer.js';
 import Series from '../MongoDB/Schema/Series.js';
@@ -39,7 +38,6 @@ AddSeries.post('/addseries', multerupload.fields([
   }
 });
 
-
 AddSeries.get('/addseries', async (req, res) => {
   try {
     const data = await Series.find();
@@ -48,7 +46,6 @@ AddSeries.get('/addseries', async (req, res) => {
     res.status(500).json({ error: "Failed to fetch series" });
   }
 });
-
 
 AddSeries.put('/addseries/:id', multerupload.fields([
   { name: 'thumbnail', maxCount: 1 },
@@ -67,8 +64,7 @@ AddSeries.put('/addseries/:id', multerupload.fields([
 
     if (req.files?.video?.[0]?.path) {
       series.video = req.files.video[0].path;
-    }
-
+    } 
     if (title) series.title = title;
     if (description) series.description = description;
     if (genres) series.genres = genres.split(',').map(g => g.trim());
@@ -85,14 +81,12 @@ AddSeries.put('/addseries/:id', multerupload.fields([
   }
 });
 
-
 AddSeries.delete('/addseries/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
     const existing = await Series.findById(id);
     if (!existing) return res.status(404).json({ error: "Series not found" });
-
 
     // Delete associated seasons and episodes
     await Season.deleteMany({ series_id: id });
@@ -107,6 +101,5 @@ AddSeries.delete('/addseries/:id', async (req, res) => {
     res.status(500).json({ error: "Failed to delete series" });
   }
 });
-
 
 export default AddSeries;
