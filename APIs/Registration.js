@@ -88,7 +88,8 @@ register.post("/registration", multerupload.single('profile'), async (req, res) 
             profile: req.file.filename
         });
         
-        
+          await newUser.save();
+
         res.status(201).json({ message: "User registered successfully", newUser });
         console.log(newUser);
 
@@ -101,8 +102,10 @@ register.post("/registration", multerupload.single('profile'), async (req, res) 
     
 register.get("/users", async (req, res) => {
     try {
-        const users = await registerschema.find({}, '-password'); // Exclude password from results
+        const users = await registerschema.find(); // Exclude password from results
         res.status(200).json(users);
+        console.log(users);
+        
     } catch (error) {
         console.error("Fetching Users Error:", error);
         res.status(500).json({ message: "Server error while fetching users" });
