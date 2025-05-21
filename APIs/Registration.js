@@ -58,9 +58,9 @@ import path from 'path';
 const register = express.Router();
 
 register.post("/registration", multerupload.single('profile'), async (req, res) => {
-    const { name, email, password, phnumber } = req.body;
+    const { name, email, password, phnumber,subscription } = req.body;
 
-    if (!name || !email || !password || !phnumber || !req.file) {
+    if (!name || !email || !password || !phnumber || !req.file || !subscription) {
         // Clean up file if it exists
         if (req.file?.path) fs.unlinkSync(req.file.path);
         return res.status(400).json({ message: "All fields are required" });
@@ -83,6 +83,7 @@ register.post("/registration", multerupload.single('profile'), async (req, res) 
             email,
             password,
             phnumber,
+            subscription,
             profile: req.file.filename
         });
 
